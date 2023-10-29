@@ -1,0 +1,28 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: jenkins
+  become_method: sudo
+  tasks: 
+  - name: Download Jenkins repo
+    ansible.builtin.get_url:
+      url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+      dest: /etc/yum.repos.d/jenkins.repo
+
+  - name: Import Jenkins Key
+    ansible.builtin.rpm_key:
+     state: present
+     key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+   
+  - name: Installing Java and Jenkins
+    ansible.builtin.yum:
+      name:
+        - fontconfig
+        - java-17-openjdk
+        - jenkins
+      state: present
+
+  - name: Starting Jenkins service
+    ansible.builtin.systemd:
+      state: started
+      name: jenkins

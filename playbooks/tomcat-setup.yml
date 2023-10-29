@@ -1,0 +1,27 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: ansible 
+  become_method: sudo
+  tasks: 
+  - name: Installing Java and Jenkins
+    ansible.builtin.yum:
+      name:
+        - fontconfig
+        - java-17-openjdk
+        - tomcat
+        - tomcat-webapps
+        - tomcat-admin-webapps
+      state: present
+
+  - name: Configuring Tomcat
+    ansible.builtin.lineinfile:
+      path: /usr/share/tomcat/conf/tomcat-users.xml
+      line: <user	username="admin" password="admin" roles="manager-gui,admin-gui"/>
+    
+
+  - name: Starting tomcat service
+    ansible.builtin.systemd:
+      state: started
+      name: tomcat
+      daemon_reload: true
